@@ -1,0 +1,49 @@
+services:
+  postgres:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DATABASE}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  n8n:
+    image: n8nio/n8n:latest
+    restart: unless-stopped
+    environment:
+      - GENERIC_TIMEZONE=America/Sao_Paulo
+      - N8N_DEFAULT_LOCALE=pt-BR
+      - N8N_RUNNERS_ENABLED=false
+
+      # HTTPS
+      - N8N_HOST=${N8N_HOST}
+      - N8N_PORT=443
+      - N8N_PROTOCOL=https
+      - N8N_SSL_CERT=${N8N_SSL_CERT}
+      - N8N_SSL_KEY=${N8N_SSL_KEY}
+
+      # Segurança
+      - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY}
+      - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
+
+      # Database
+      - DB_TYPE=postgresdb
+      - DB_POSTGRESDB_HOST=postgres
+      - DB_POSTGRESDB_PORT=5432
+      - DB_POSTGRESDB_DATABASE=${POSTGRES_DATABASE}
+      - DB_POSTGRESDB_USER=${POSTGRES_USER}
+      - DB_POSTGRESDB_PASSWORD=${POSTGRES_PASSWORD}
+
+    ports:
+      - "443:443"
+    volumes:
+      - n8n_data:/home/node/.n8n
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:
+  n8n_data:
