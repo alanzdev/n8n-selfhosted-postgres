@@ -1,7 +1,8 @@
 services:
   postgres:
     image: postgres:16
-    restart: unless-stopped
+    container_name: n8n-postgres
+    #restart: unless-stopped
     environment:
       POSTGRES_DB: ${POSTGRES_DATABASE}
       POSTGRES_USER: ${POSTGRES_USER}
@@ -11,38 +12,44 @@ services:
 
   n8n:
     image: n8nio/n8n:latest
-    restart: unless-stopped
+    container_name: n8n
+    #restart: unless-stopped
     environment:
       - GENERIC_TIMEZONE=America/Sao_Paulo
       - N8N_DEFAULT_LOCALE=pt-BR
-      - N8N_RUNNERS_ENABLED=false
-
-      # HTTPS
       - N8N_HOST=${N8N_HOST}
-      - N8N_PORT=443
+      - N8N_PORT=5678
       - N8N_PROTOCOL=https
-      - N8N_SSL_CERT=${N8N_SSL_CERT}
-      - N8N_SSL_KEY=${N8N_SSL_KEY}
-
-      # Segurança
+      - WEBHOOK_URL=https://${N8N_HOST}
       - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY}
-      - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
 
-      # Database
+      - N8N_RUNNERS_MODE=external
+      - N8N_RUNNERS_BROKER_LISTEN_ADDRESS=0.0.0.0
+      - N8N_RUNNERS_AUTH_TOKEN=${RUNNER_TOKEN}
+      - N8N_NATIVE_PYTHON_RUNNER=true
+      - N8N_MIGRATE_FS_STORAGE_PATH=true
+
       - DB_TYPE=postgresdb
       - DB_POSTGRESDB_HOST=postgres
       - DB_POSTGRESDB_PORT=5432
       - DB_POSTGRESDB_DATABASE=${POSTGRES_DATABASE}
       - DB_POSTGRESDB_USER=${POSTGRES_USER}
       - DB_POSTGRESDB_PASSWORD=${POSTGRES_PASSWORD}
-
     ports:
-      - "443:443"
+      - "5678:5678"
     volumes:
       - n8n_data:/home/node/.n8n
-      - /etc/letsencrypt:/etc/letsencrypt:ro
     depends_on:
       - postgres
+
+  task-runners:
+    image: n8nio/runners:latest
+    container_name: n8n-runners
+    environment:
+      - N8N_RUNNERS_TASK_BROKER_URI=http://n8n:5679
+      - N8N_RUNNERS_AUTH_TOKEN=${RUNNER_TOKEN}
+    depends_on:
+      - n8n
 
 volumes:
   postgres_data:
