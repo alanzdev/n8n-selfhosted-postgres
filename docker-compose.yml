@@ -2,7 +2,7 @@ services:
   postgres:
     image: postgres:16
     container_name: n8n-postgres
-    #restart: unless-stopped
+    restart: unless-stopped
     environment:
       POSTGRES_DB: ${POSTGRES_DATABASE}
       POSTGRES_USER: ${POSTGRES_USER}
@@ -13,7 +13,7 @@ services:
   n8n:
     image: n8nio/n8n:latest
     container_name: n8n
-    #restart: unless-stopped
+    restart: unless-stopped
     environment:
       - GENERIC_TIMEZONE=America/Sao_Paulo
       - N8N_DEFAULT_LOCALE=pt-BR

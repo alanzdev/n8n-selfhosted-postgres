@@ -1,0 +1,38 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    timeout-minutes: 20
+    env:
+      N8N_ENCRYPTION_KEY: ${{ secrets.N8N_ENCRYPTION_KEY }}
+      N8N_RUNNERS_AUTH_TOKEN: ${{ secrets.N8N_RUNNERS_AUTH_TOKEN }}
+      RUNNER_TOKEN: ${{ secrets.N8N_RUNNERS_AUTH_TOKEN }}
+      N8N_HOST: ${{ secrets.N8N_HOST }}
+      N8N_SSL_CERT: ${{ secrets.N8N_SSL_CERT }}
+      N8N_SSL_KEY: ${{ secrets.N8N_SSL_KEY }}
+      CERT_VOLUMES: ${{ secrets.CERT_VOLUMES }}
+      POSTGRES_DATABASE: ${{ secrets.POSTGRES_DATABASE }}
+      POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+      POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Pull latest Docker images
+        run: docker compose pull
+
+      - name: Restart services
+        run: docker compose up -d --force-recreate --remove-orphans
+
+      - name: Verify services are running
+        run: |
+          sleep 10
+          docker compose ps
