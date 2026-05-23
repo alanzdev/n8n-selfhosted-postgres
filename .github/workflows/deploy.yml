@@ -15,12 +15,12 @@ jobs:
       N8N_ENCRYPTION_KEY: ${{ secrets.N8N_ENCRYPTION_KEY }}
       N8N_RUNNERS_AUTH_TOKEN: ${{ secrets.N8N_RUNNERS_AUTH_TOKEN }}
       RUNNER_TOKEN: ${{ secrets.N8N_RUNNERS_AUTH_TOKEN }}
-      N8N_HOST: ${{ secrets.N8N_HOST }}
-      N8N_SSL_CERT: ${{ secrets.N8N_SSL_CERT }}
-      N8N_SSL_KEY: ${{ secrets.N8N_SSL_KEY }}
-      CERT_VOLUMES: ${{ secrets.CERT_VOLUMES }}
-      POSTGRES_DATABASE: ${{ secrets.POSTGRES_DATABASE }}
-      POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+      N8N_HOST: ${{ vars.N8N_HOST }}
+      N8N_SSL_CERT: ${{ vars.N8N_SSL_CERT }}
+      N8N_SSL_KEY: ${{ vars.N8N_SSL_KEY }}
+      CERT_VOLUMES: ${{ vars.CERT_VOLUMES }}
+      POSTGRES_DATABASE: ${{ vars.POSTGRES_DATABASE }}
+      POSTGRES_USER: ${{ vars.POSTGRES_USER }}
       POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
 
     steps:
