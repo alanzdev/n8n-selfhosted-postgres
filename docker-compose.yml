@@ -47,6 +47,9 @@ services:
       - n8n_data:/home/node/.n8n
     depends_on:
       - postgres
+    networks:
+      - default
+      - proxy
 
   task-runners:
     image: n8nio/runners:latest
@@ -60,3 +63,7 @@ services:
 volumes:
   postgres_data:
   n8n_data:
+
+networks:
+  proxy:
+    external: true
